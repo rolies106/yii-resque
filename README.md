@@ -1,6 +1,6 @@
 # Yii Resque
 
-Yii resque is a wrapping component for Yii queue your background jobs, this is based on [php-resque](https://github.com/chrisboulton/php-resque) with some enhancement for support phpredis.
+Yii resque is a component for Yii to queue your background jobs, this component based on [php-resque](https://github.com/chrisboulton/php-resque) with some enhancement for support phpredis.
 
 ## Requirement
 
