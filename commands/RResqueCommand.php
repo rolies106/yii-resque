@@ -37,18 +37,18 @@ EOD;
 
         $server = (!empty(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
         $port = (!empty(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
-        $db = (!empty(Yii::app()->resque->database)) ? Yii::app()->resque->database : '0';
+        $db = (!empty(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
 
         $host = $server . ':' . $port;
 
-        $command = 'QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
+        $command = 'nohup sh -c "QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
 
-        exec($command);
+        exec($command, $return);
     }
 
     public function actionStop($quit = null)
     {
-        exec("ps u | grep resque", $out);
+        exec("ps aux | grep resque", $out);
 
         foreach ($out as $pid) {
             if (strpos($pid, 'yiic rresque stop')) {
@@ -57,11 +57,18 @@ EOD;
             
             $pids = explode(' ', $pid);
 
-            if (empty($quit)) {
-                $command = 'kill ' . $pids[1];
-            } else {
-                $command = 'kill -3' . $pids[1];
+            $processID = (empty($pids[1])) ? $pids[2] : $pids[1];
+
+            if (empty($processID)) {
+                continue;
             }
+
+            if (empty($quit)) {
+                $command = 'kill ' . $processID;
+            } else {
+                $command = 'kill -s SIGQUIT' . $processID;
+            }
+
             exec($command);
         }
     }
