@@ -56,6 +56,7 @@ EOD;
             }
             
             $pids = explode(' ', $pid);
+            $pids = array_values(array_filter($pids, 'strlen'));
 
             $processID = (empty($pids[1])) ? $pids[2] : $pids[1];
 
@@ -66,7 +67,7 @@ EOD;
             if (empty($quit)) {
                 $command = 'kill ' . $processID;
             } else {
-                $command = 'kill -s SIGQUIT' . $processID;
+                $command = 'kill -s QUIT ' . $processID;
             }
 
             exec($command);
