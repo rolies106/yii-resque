@@ -47,14 +47,22 @@ Put your workers inside Worker folder and name the class with ```Worker_``` as p
 
 Run this command from your console/terminal :
 
+Start queue
+
 ```bash
     yiic rresque start
 ```
 
-or
+Stop queue :
 
 ```bash
     yiic rresque stop
+```
+
+Stop queue with QUIT signal :
+
+```bash
+    yiic rresque stop --quit=true
 ```
 
 ## Copyrights
