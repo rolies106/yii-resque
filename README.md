@@ -35,7 +35,7 @@ Yii resque is a component for Yii to queue your background jobs, this component 
 
 ### Create job and Workers
 
-You can put this line where ever you want to register the queue
+You can put this line where ever you want to add jobs to queue
 
 ```php
     Yii::app()->resque->createJob('queue_name', 'Worker_ClassWorker', $args = array());
