@@ -1,5 +1,5 @@
 <?php
-if (class_exists('Redis'))
+if (class_exists('Redis', false))
 {
 	class RedisApi extends Redis
 	{

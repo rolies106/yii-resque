@@ -27,6 +27,11 @@ class Resque
 	protected static $redisDatabase = 0;
 
 	/**
+	 * @var int ID of Redis database to select.
+	 */
+	protected static $redisPassword = '';
+
+	/**
 	 * Given a host/port combination separated by a colon, set it as
 	 * the redis server that Resque will talk to.
 	 *
@@ -34,10 +39,11 @@ class Resque
 	 *                      a nested array of servers with host/port pairs.
 	 * @param int $database
 	 */
-	public static function setBackend($server, $database = 0)
+	public static function setBackend($server, $database = 0, $password = '')
 	{
 		self::$redisServer   = $server;
 		self::$redisDatabase = $database;
+		self::$redisPassword = $password;
 		self::$redis         = null;
 	}
 
@@ -57,7 +63,14 @@ class Resque
 			$server = 'localhost:6379';
 		}
 
-		self::$redis = new Resque_Redis($server, self::$redisDatabase);
+		self::$redis = new Resque_Redis($server, self::$redisDatabase, self::$redisPassword);
+
+        if (isset(self::$redisPassword) && !empty(self::$redisPassword)) {
+            if (self::$redis->auth(self::$redisPassword) === false) {
+                throw new CException('Resque failed to authenticate with redis!');
+            }
+        }
+
 		return self::$redis;
 	}
 

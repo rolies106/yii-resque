@@ -35,6 +35,11 @@ class RResque extends CApplicationComponent
     public $database = 0;
 
     /**
+     * @var string Redis password auth
+     */
+    public $password = '';
+
+    /**
      * Initializes the connection.
      */
     public function init()
@@ -55,7 +60,7 @@ class RResque extends CApplicationComponent
             spl_autoload_register(array('YiiBase','autoload'));
         }
 
-        Resque::setBackend($this->server . ':' . $this->port, $this->database);
+        Resque::setBackend($this->server . ':' . $this->port, $this->database, $this->password);
     }
 
     /**
