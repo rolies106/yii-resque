@@ -66,6 +66,47 @@ Stop queue with QUIT signal :
     yiic rresque stop --quit=true
 ```
 
+### Create Delayed Job
+
+You can run job at specific time
+
+```php
+    $time = 1332067214;
+    Yii::app()->resque->enqueueJobAt($time, 'queue_name', 'Worker_ClassWorker', $args = array());
+```
+
+or run job after n second 
+
+```php
+    $in = 3600;
+    $args = array('id' => $user->id);
+    Yii::app()->resque->enqueueIn($in, 'email', 'Worker_ClassWorker', $args);
+```
+
+### Create Recurring Job
+
+This is some trick that sometime useful if you want to do some recurring job like sending weekly newsletter, I just made some modification in my worker ```tearDown``` event
+
+```php
+    public function tearDown()
+    {
+        $interval = 3600; # This job will repeat every hour
+
+        # Add next job queue based on interval
+        Yii::app()->resque->enqueueJobIn($interval, 'queue_name', 'Worker_Newsletter', $args = array());
+    }
+```
+
+So everytime job has done completely the worker will send queue for same job.
+
+### Get Current Queues
+
+This will return all job in queue (EXCLUDE all active job)
+
+```php
+    Yii::app()->resque->getQueues();
+```
+
 ## Copyrights
 
 Copyright (c) 2013 Rolies106
@@ -75,3 +116,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Contributors
+
+- rolies106
+- You
