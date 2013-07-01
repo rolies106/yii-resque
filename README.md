@@ -44,28 +44,6 @@ You can put this line where ever you want to add jobs to queue
 
 Put your workers inside Worker folder and name the class with ```Worker_``` as prefix, e.g you want to create worker with name SendEmail then you can create file inside Worker folder and name it SendEmail.php, class inside this file must be ```Worker_SendEmail```
 
-### Start and Stop workers
-
-Run this command from your console/terminal :
-
-Start queue
-
-```bash
-    yiic rresque start
-```
-
-Stop queue :
-
-```bash
-    yiic rresque stop
-```
-
-Stop queue with QUIT signal :
-
-```bash
-    yiic rresque stop --quit=true
-```
-
 ### Create Delayed Job
 
 You can run job at specific time
@@ -105,6 +83,40 @@ This will return all job in queue (EXCLUDE all active job)
 
 ```php
     Yii::app()->resque->getQueues();
+```
+
+### Start and Stop workers
+
+Run this command from your console/terminal :
+
+Start queue
+
+```bash
+    yiic rresque start
+```
+
+or 
+
+```bash
+    yiic rresque start --queue=queue_name --interval=5 --verbose=0
+```
+
+Start delayed or scheduled queue
+
+```bash
+    yiic rresque startrecurring
+```
+
+Stop queue
+
+```bash
+    yiic rresque stop
+```
+
+Stop queue with QUIT signal
+
+```bash
+    yiic rresque stop --quit=true
 ```
 
 ## Copyrights

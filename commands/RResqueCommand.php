@@ -20,7 +20,8 @@ This is the command for the yii-resque component. Usage:
 
 Available commands are:
 
-    start --queue=[queue_name | *] --interval=[int] --verbose[0|1]
+    start --queue=[queue_name | *] --interval=[int] --verbose=[0|1]
+    startrecurring --queue=[queue_name | *] --interval=[int] --verbose=[0|1]
     stop --quit=[0|1]
 
 EOD;
@@ -43,6 +44,27 @@ EOD;
         $host = $server . ':' . $port;
 
         $command = 'nohup sh -c "QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
+
+        exec($command, $return);
+    }
+
+    public function actionStartrecurring($queue = '*', $interval = 5, $verbose = 1)
+    {
+        $resquePath = YiiBase::getPathOfAlias('application.components.yii-resque');
+
+        if (empty(Yii::app()->resque)) {
+            echo 'resque component cannot be found on your console.php configuration';
+            die();
+        }
+
+        $server = (!empty(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
+        $port = (!empty(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
+        $db = (!empty(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
+        $auth = (!empty(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
+
+        $host = $server . ':' . $port;
+
+        $command = 'nohup sh -c "QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque-scheduler" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_scheduler_log.log 2>&1 &';
 
         exec($command, $return);
     }
