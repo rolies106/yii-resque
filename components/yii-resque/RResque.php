@@ -78,6 +78,46 @@ class RResque extends CApplicationComponent
     }
 
     /**
+     * Create a new scheduled job and save it to the specified queue.
+     *
+     * @param int $in Second count down to job.
+     * @param string $queue The name of the queue to place the job in.
+     * @param string $class The name of the class that contains the code to execute the job.
+     * @param array $args Any optional arguments that should be passed when the job is executed.
+     *
+     * @return string
+     */
+    public function enqueueJobIn($in, $queue, $class, $args = array())
+    {
+        return ResqueScheduler::enqueueIn($in, $queue, $class, $args);
+    }
+
+    /**
+     * Create a new scheduled job and save it to the specified queue.
+     *
+     * @param timestamp $at UNIX timestamp when job should be executed.
+     * @param string $queue The name of the queue to place the job in.
+     * @param string $class The name of the class that contains the code to execute the job.
+     * @param array $args Any optional arguments that should be passed when the job is executed.
+     *
+     * @return string
+     */
+    public function enqueueJobAt($at, $queue, $class, $args = array())
+    {
+        return ResqueScheduler::enqueueAt($at, $queue, $class, $args);
+    }
+
+    /**
+     * Get delayed jobs count
+     *
+     * @return int
+     */
+    public function getDelayedJobsCount()
+    {
+        return (int)Resque::redis()->zcard('delayed_queue_schedule');
+    }
+
+    /**
      * Check job status
      *
      * @param string $token Job token ID
@@ -88,5 +128,25 @@ class RResque extends CApplicationComponent
     {
         $status = new Resque_Job_Status($token);
         return $status->get();
+    }
+
+    /**
+     * Return Redis
+     *
+     * @return object Redis instance
+     */
+    public function redis()
+    {
+        return Resque::redis();
+    }
+
+    /**
+     * Get queues
+     *
+     * @return object Redis instance
+     */
+    public function getQueues()
+    {
+        return $this->redis()->zRange('delayed_queue_schedule', 0, -1)
     }
 }

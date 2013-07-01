@@ -29,7 +29,11 @@ class RResqueAutoloader
     {
         if (is_file($file = dirname(__FILE__).'/lib/'.str_replace(array('_', "\0"), array('/', ''), $class).'.php')) {
             require $file;
+        } else if (is_file($file = dirname(__FILE__).'/lib/ResqueScheduler/'.str_replace(array('_', "\0"), array('/', ''), $class).'.php')) {
+            require $file;
         } else if (is_file($file = dirname(__FILE__).'/'.str_replace(array('_', "\0"), array('/', ''), $class).'.php')) {
+            require $file;
+        } else if (is_file($file = dirname(__FILE__).'/lib/'.str_replace(array('\\', "\0"), array('/', ''), $class).'.php')) {
             require $file;
         }
     }

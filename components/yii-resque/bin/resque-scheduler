@@ -36,6 +36,20 @@ spl_autoload_unregister(array('YiiBase','autoload'));
 # Give back the power to Yii
 spl_autoload_register(array('YiiBase','autoload'));
 
+// // Look for an environment variable with 
+// $RESQUE_PHP = getenv('RESQUE_PHP');
+// if (!empty($RESQUE_PHP)) {
+//     require_once $RESQUE_PHP;
+// }
+// // Otherwise, if we have no Resque then assume it is in the include path
+// else if (!class_exists('Resque')) {
+//     require_once 'Resque/Resque.php';
+// }
+
+// Load resque-scheduler
+// require_once dirname(__FILE__) . '/lib/ResqueScheduler.php';
+// require_once dirname(__FILE__) . '/lib/ResqueScheduler/Worker.php';
+
 $QUEUE = getenv('QUEUE');
 if(empty($QUEUE)) {
     die("Set QUEUE env var containing the list of queues to work.\n");
@@ -49,27 +63,23 @@ if(!empty($REDIS_BACKEND)) {
     Resque::setBackend($REDIS_BACKEND, $REDIS_BACKEND_DB, $REDIS_AUTH);
 }
 
+// Set log level for resque-scheduler
 $logLevel = 0;
 $LOGGING = getenv('LOGGING');
 $VERBOSE = getenv('VERBOSE');
 $VVERBOSE = getenv('VVERBOSE');
 if(!empty($LOGGING) || !empty($VERBOSE)) {
-    $logLevel = Resque_Worker::LOG_NORMAL;
+    $logLevel = ResqueScheduler_Worker::LOG_NORMAL;
 }
 else if(!empty($VVERBOSE)) {
-    $logLevel = Resque_Worker::LOG_VERBOSE;
+    $logLevel = ResqueScheduler_Worker::LOG_VERBOSE;
 }
 
+// Check for jobs every $interval seconds
 $interval = 5;
 $INTERVAL = getenv('INTERVAL');
 if(!empty($INTERVAL)) {
     $interval = $INTERVAL;
-}
-
-$count = 1;
-$COUNT = getenv('COUNT');
-if(!empty($COUNT) && $COUNT > 1) {
-    $count = $COUNT;
 }
 
 $PREFIX = getenv('PREFIX');
@@ -78,35 +88,14 @@ if(!empty($PREFIX)) {
     Resque_Redis::prefix($PREFIX);
 }
 
-if($count > 1) {
-    for($i = 0; $i < $count; ++$i) {
-        $pid = Resque::fork();
-        if($pid == -1) {
-            die("Could not fork worker ".$i."\n");
-        }
-        // Child, start the worker
-        else if(!$pid) {
-            $queues = explode(',', $QUEUE);
-            $worker = new Resque_Worker($queues);
-            $worker->logLevel = $logLevel;
-            fwrite(STDOUT, '*** Starting worker '.$worker."\n");
-            $worker->work($interval);
-            break;
-        }
-    }
-}
-// Start a single worker
-else {
-    $queues = explode(',', $QUEUE);
-    $worker = new Resque_Worker($queues);
-    $worker->logLevel = $logLevel;
+$worker = new ResqueScheduler_Worker();
+$worker->logLevel = $logLevel;
 
-    $PIDFILE = getenv('PIDFILE');
-    if ($PIDFILE) {
-        file_put_contents($PIDFILE, getmypid()) or
-            die('Could not write PID information to ' . $PIDFILE);
-    }
-
-    fwrite(STDOUT, '*** Starting worker '.$worker."\n");
-    $worker->work($interval);
+$PIDFILE = getenv('PIDFILE');
+if ($PIDFILE) {
+    file_put_contents($PIDFILE, getmypid()) or
+        die('Could not write PID information to ' . $PIDFILE);
 }
+
+fwrite(STDOUT, "*** Starting scheduler worker\n");
+$worker->work($interval);
