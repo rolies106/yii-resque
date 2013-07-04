@@ -147,6 +147,6 @@ class RResque extends CApplicationComponent
      */
     public function getQueues()
     {
-        return $this->redis()->zRange('delayed_queue_schedule', 0, -1)
+        return $this->redis()->zRange('delayed_queue_schedule', 0, -1);
     }
 }
