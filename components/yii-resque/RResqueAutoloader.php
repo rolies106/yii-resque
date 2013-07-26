@@ -15,7 +15,7 @@ class RResqueAutoloader
     static public function register()
     {
         // ini_set('unserialize_callback_func', 'spl_autoload_call');
-        spl_autoload_register(array(new self, 'autoload'));
+        Yii::registerAutoloader(array(new self,'autoload'),true);
     }
 
     /**
