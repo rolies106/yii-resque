@@ -31,15 +31,15 @@ EOD;
     {
         $resquePath = YiiBase::getPathOfAlias('application.components.yii-resque');
 
-        if (empty(Yii::app()->resque)) {
+        if (!isset(Yii::app()->resque)) {
             echo 'resque component cannot be found on your console.php configuration';
             die();
         }
 
-        $server = (!empty(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
-        $port = (!empty(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
-        $db = (!empty(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
-        $auth = (!empty(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
+        $server = (isset(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
+        $port = (isset(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
+        $db = (isset(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
+        $auth = (isset(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
 
         $host = $server . ':' . $port;
 
@@ -52,15 +52,15 @@ EOD;
     {
         $resquePath = YiiBase::getPathOfAlias('application.components.yii-resque');
 
-        if (empty(Yii::app()->resque)) {
+        if (!isset(Yii::app()->resque)) {
             echo 'resque component cannot be found on your console.php configuration';
             die();
         }
 
-        $server = (!empty(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
-        $port = (!empty(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
-        $db = (!empty(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
-        $auth = (!empty(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
+        $server = (isset(Yii::app()->resque->server)) ? Yii::app()->resque->server : 'localhost';
+        $port = (isset(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
+        $db = (isset(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
+        $auth = (isset(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
 
         $host = $server . ':' . $port;
 
