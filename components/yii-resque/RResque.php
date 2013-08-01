@@ -139,8 +139,8 @@ class RResque extends CApplicationComponent
     {
         return Resque::redis();
     }
-
-    /**
+}
+   /**
      * Get queues
      *
      * @return object Redis instance

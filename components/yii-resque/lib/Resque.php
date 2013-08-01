@@ -65,11 +65,8 @@ class Resque
 
 		self::$redis = new Resque_Redis($server, self::$redisDatabase, self::$redisPassword);
 
-        if (isset(self::$redisPassword) && !empty(self::$redisPassword)) {
-            if (self::$redis->auth(self::$redisPassword) === false) {
-                throw new CException('Resque failed to authenticate with redis!');
-            }
-        }
+        # Select Database
+        self::$redis->select(self::$redisDatabase);
 
 		return self::$redis;
 	}
