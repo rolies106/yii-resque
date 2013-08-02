@@ -20,14 +20,14 @@ This is the command for the yii-resque component. Usage:
 
 Available commands are:
 
-    start --queue=[queue_name | *] --interval=[int] --verbose=[0|1]
+    start --queue=[queue_name | *] --interval=[int] --verbose=[0|1] --count=[int]
     startrecurring --queue=[queue_name | *] --interval=[int] --verbose=[0|1]
     stop --quit=[0|1]
 
 EOD;
     }
 
-    public function actionStart($queue = '*', $interval = 5, $verbose = 1)
+    public function actionStart($queue = '*', $interval = 5, $verbose = 1, $count = 5)
     {
         $resquePath = YiiBase::getPathOfAlias('application.components.yii-resque');
 
@@ -40,10 +40,11 @@ EOD;
         $port = (isset(Yii::app()->resque->port)) ? Yii::app()->resque->port : '6379';
         $db = (isset(Yii::app()->resque->database)) ? Yii::app()->resque->database : '3';
         $auth = (isset(Yii::app()->resque->password)) ? Yii::app()->resque->password : '';
+        $prefix = Yii::app()->resque->prefix;
 
         $host = $server . ':' . $port;
 
-        $command = 'nohup sh -c "QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
+        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . $resquePath.'/bin/resque" >> ' . dirname(__FILE__) . '/../../logs/runtime/yii_resque_log.log 2>&1 &';
 
         exec($command, $return);
     }
@@ -64,7 +65,7 @@ EOD;
 
         $host = $server . ':' . $port;
 
-        $command = 'nohup sh -c "QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque-scheduler" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_scheduler_log.log 2>&1 &';
+        $command = 'nohup sh -c "QUEUE=' . $queue . ' COUNT = '.$count.' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque-scheduler" >> ' . dirname(__FILE__) . '/../../logs/runtime/yii_resque_scheduler_log.log 2>&1 &';
 
         exec($command, $return);
     }
