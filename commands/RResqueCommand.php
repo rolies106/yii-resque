@@ -44,12 +44,12 @@ EOD;
 
         $host = $server . ':' . $port;
 
-        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE=' . $queue . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . $resquePath.'/bin/resque" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
+        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE=' . $queue . ' COUNT=' . $count . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . $resquePath.'/bin/resque" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_log.log 2>&1 &';
 
         exec($command, $return);
     }
 
-    public function actionStartrecurring($queue = '*', $interval = 5, $verbose = 1)
+    public function actionStartrecurring($queue = '*', $interval = 5, $verbose = 1, $count = 1)
     {
         $resquePath = YiiBase::getPathOfAlias('application.components.yii-resque');
 
@@ -65,7 +65,7 @@ EOD;
 
         $host = $server . ':' . $port;
 
-        $command = 'nohup sh -c "QUEUE=' . $queue . ' COUNT = '.$count.' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque-scheduler" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_scheduler_log.log 2>&1 &';
+        $command = 'nohup sh -c "QUEUE=' . $queue . ' COUNT=' . $count . ' REDIS_BACKEND=' . $host . ' REDIS_BACKEND_DB=' . $db . ' REDIS_AUTH=' . $auth . ' INTERVAL=' . $interval . ' VERBOSE=' . $verbose . ' php ' . dirname(__FILE__) . '/../components/yii-resque/bin/resque-scheduler" >> ' . dirname(__FILE__) . '/../runtime/yii_resque_scheduler_log.log 2>&1 &';
 
         exec($command, $return);
     }
