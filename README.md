@@ -1,6 +1,6 @@
 # Yii Resque
 
-Yii resque is a component for Yii to queue your background jobs, this component based on [php-resque](https://github.com/chrisboulton/php-resque) and [php-resque-scheduler](https://github.com/chrisboulton/php-resque-scheduler) with some enhancement for support phpredis.
+Yii resque is a component for Yii to queue your background jobs, this component based on [php-resque](https://github.com/chrisboulton/php-resque) and [php-resque-scheduler](https://github.com/chrisboulton/php-resque-scheduler) with some enhancement for support phpredis, I'm also added log handler using [Monolog](https://github.com/Seldaek/monolog), already tested with [ResqueBoard](https://github.com/kamisama/ResqueBoard).
 
 ## Requirement
 
@@ -118,6 +118,44 @@ Stop queue with QUIT signal
 ```bash
     yiic rresque stop --quit=true
 ```
+
+## Start Worker Options
+
+This is available options for starting worker using `yiic` command :
+
+* Set queue name
+
+```bash
+--queue=[queue_name]
+```
+This option default to `*` means all queue.
+
+* Set interval time
+
+```bash
+--interval=[time in second]
+```
+Set your interval time for checking new job.
+
+* Run in verbose mode
+
+```bash
+--verbose=[1 or 0]
+```
+Set to `1` if you want to see more information in log file.
+
+* Number of worker
+
+```bash
+--count=[integer]
+```
+
+* Log handler name and log handler target
+
+```bash
+--loghandler=[string] --logtarget=[string]
+```
+You can see available log handler at (Monolog-Init)[https://github.com/kamisama/Monolog-Init].
 
 ## Copyrights
 
