@@ -44,6 +44,7 @@ if(empty($QUEUE)) {
 $REDIS_BACKEND = getenv('REDIS_BACKEND');
 $REDIS_BACKEND_DB = getenv('REDIS_BACKEND_DB');
 $REDIS_AUTH = getenv('REDIS_AUTH');
+
 if(!empty($REDIS_BACKEND)) {
     $REDIS_BACKEND_DB = (!empty($REDIS_BACKEND_DB)) ? $REDIS_BACKEND_DB : 0;
     Resque::setBackend($REDIS_BACKEND, $REDIS_BACKEND_DB, $REDIS_AUTH);
@@ -55,9 +56,22 @@ $VERBOSE = getenv('VERBOSE');
 $VVERBOSE = getenv('VVERBOSE');
 if(!empty($LOGGING) || !empty($VERBOSE)) {
     $logLevel = Resque_Worker::LOG_NORMAL;
-}
-else if(!empty($VVERBOSE)) {
+} else if(!empty($VVERBOSE)) {
     $logLevel = Resque_Worker::LOG_VERBOSE;
+}
+
+$logger = null;
+$LOG_HANDLER = getenv('LOGHANDLER');
+$LOG_HANDLER_TARGET = getenv('LOGHANDLERTARGET');
+
+if (class_exists('MonologInit_MonologInit')) {
+    if (!empty($LOG_HANDLER) && !empty($LOG_HANDLER_TARGET)) {
+        $logger = new MonologInit_MonologInit($LOG_HANDLER, $LOG_HANDLER_TARGET);
+    } else {
+        fwrite(STDOUT, '*** loghandler or logtarget is not set.'."\n");    
+    }
+} else {
+    fwrite(STDOUT, '*** MonologInit_MonologInit logger cannot be found, continue without loghandler.'."\n");
 }
 
 $interval = 5;
@@ -86,27 +100,33 @@ if($count > 1) {
         }
         // Child, start the worker
         else if(!$pid) {
-            $queues = explode(',', $QUEUE);
-            $worker = new Resque_Worker($queues);
-            $worker->logLevel = $logLevel;
-            fwrite(STDOUT, '*** Starting worker '.$worker."\n");
-            $worker->work($interval);
+            startWorker($QUEUE, $logLevel, $logger, $interval);
             break;
         }
     }
 }
 // Start a single worker
 else {
-    $queues = explode(',', $QUEUE);
-    $worker = new Resque_Worker($queues);
-    $worker->logLevel = $logLevel;
-
     $PIDFILE = getenv('PIDFILE');
     if ($PIDFILE) {
         file_put_contents($PIDFILE, getmypid()) or
             die('Could not write PID information to ' . $PIDFILE);
     }
 
-    fwrite(STDOUT, '*** Starting worker '.$worker."\n");
+    startWorker($QUEUE, $logLevel, $logger, $interval);
+}
+
+function startWorker($QUEUE, $logLevel, $logger, $interval)
+{
+    $queues = explode(',', $QUEUE);
+    $worker = new Resque_Worker($queues);
+
+    if (!empty($logger)) {
+        $worker->registerLogger($logger);    
+    } else {
+        fwrite(STDOUT, '*** Starting worker '.$worker."\n");
+    }
+    
+    $worker->logLevel = $logLevel;
     $worker->work($interval);
 }

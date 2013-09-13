@@ -52,20 +52,33 @@ class Resque_Job
 	 */
 	public static function create($queue, $class, $args = null, $monitor = false)
 	{
-		if($args !== null && !is_array($args)) {
+		if ($args !== null && !is_array($args)) {
 			throw new InvalidArgumentException(
 				'Supplied $args must be an array.'
 			);
 		}
-		$id = md5(uniqid('', true));
+
+		$new = true;
+		if(isset($args['id'])) {
+			$id = $args['id'];
+			// unset($args['id']);
+			$new = false;
+		} else {
+			$id = md5(uniqid('', true));
+		}
 		Resque::push($queue, array(
 			'class'	=> $class,
 			'args'	=> array($args),
 			'id'	=> $id,
 		));
 
-		if($monitor) {
-			Resque_Job_Status::create($id);
+		if ($monitor) {
+			if ($new) {
+				Resque_Job_Status::create($id);
+			} else {
+				$statusInstance = new Resque_Job_Status($id);
+				$statusInstance->update($id, Resque_Job_Status::STATUS_WAITING);
+			}
 		}
 
 		return $id;
@@ -139,19 +152,23 @@ class Resque_Job
 			return $this->instance;
 		}
 
-		if(!class_exists($this->payload['class'])) {
-			throw new Resque_Exception(
-				'Could not find job class ' . $this->payload['class'] . '.'
-			);
+		if (class_exists('Resque_Job_Creator')) {
+			$this->instance = Resque_Job_Creator::createJob($this->payload['class'], $this->getArguments());
+		} else {
+			if(!class_exists($this->payload['class'])) {
+				throw new Resque_Exception(
+					'Could not find job class ' . $this->payload['class'] . '.'
+				);
+			}
+
+			if(!method_exists($this->payload['class'], 'perform')) {
+				throw new Resque_Exception(
+					'Job class ' . $this->payload['class'] . ' does not contain a perform method.'
+				);
+			}
+			$this->instance = new $this->payload['class']();
 		}
 
-		if(!method_exists($this->payload['class'], 'perform')) {
-			throw new Resque_Exception(
-				'Job class ' . $this->payload['class'] . ' does not contain a perform method.'
-			);
-		}
-
-		$this->instance = new $this->payload['class']();
 		$this->instance->job = $this;
 		$this->instance->args = $this->getArguments();
 		$this->instance->queue = $this->queue;
@@ -204,6 +221,7 @@ class Resque_Job
 		));
 
 		$this->updateStatus(Resque_Job_Status::STATUS_FAILED);
+		require_once dirname(__FILE__) . '/Failure.php';
 		Resque_Failure::create(
 			$this->payload,
 			$exception,
@@ -236,17 +254,12 @@ class Resque_Job
 	 */
 	public function __toString()
 	{
-		$name = array(
-			'Job{' . $this->queue .'}'
-		);
-		if(!empty($this->payload['id'])) {
-			$name[] = 'ID: ' . $this->payload['id'];
-		}
-		$name[] = $this->payload['class'];
-		if(!empty($this->payload['args'])) {
-			$name[] = json_encode($this->payload['args']);
-		}
-		return '(' . implode(' | ', $name) . ')';
+		return json_encode(array(
+					'queue' => $this->queue,
+					'id' => !empty($this->payload['id']) ? $this->payload['id'] : '',
+					'class' => $this->payload['class'],
+					'args' => !empty($this->payload['args']) ? $this->payload['args'] : ''
+				));
 	}
 }
-?>
+

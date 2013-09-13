@@ -36,20 +36,6 @@ spl_autoload_unregister(array('YiiBase','autoload'));
 # Give back the power to Yii
 spl_autoload_register(array('YiiBase','autoload'));
 
-// // Look for an environment variable with 
-// $RESQUE_PHP = getenv('RESQUE_PHP');
-// if (!empty($RESQUE_PHP)) {
-//     require_once $RESQUE_PHP;
-// }
-// // Otherwise, if we have no Resque then assume it is in the include path
-// else if (!class_exists('Resque')) {
-//     require_once 'Resque/Resque.php';
-// }
-
-// Load resque-scheduler
-// require_once dirname(__FILE__) . '/lib/ResqueScheduler.php';
-// require_once dirname(__FILE__) . '/lib/ResqueScheduler/Worker.php';
-
 $QUEUE = getenv('QUEUE');
 if(empty($QUEUE)) {
     die("Set QUEUE env var containing the list of queues to work.\n");
@@ -69,10 +55,23 @@ $LOGGING = getenv('LOGGING');
 $VERBOSE = getenv('VERBOSE');
 $VVERBOSE = getenv('VVERBOSE');
 if(!empty($LOGGING) || !empty($VERBOSE)) {
-    $logLevel = ResqueScheduler_Worker::LOG_NORMAL;
+    $logLevel = Resque_Worker::LOG_NORMAL;
+} else if(!empty($VVERBOSE)) {
+    $logLevel = Resque_Worker::LOG_VERBOSE;
 }
-else if(!empty($VVERBOSE)) {
-    $logLevel = ResqueScheduler_Worker::LOG_VERBOSE;
+
+$logger = null;
+$LOG_HANDLER = getenv('LOGHANDLER');
+$LOG_HANDLER_TARGET = getenv('LOGHANDLERTARGET');
+
+if (class_exists('MonologInit_MonologInit')) {
+    if (!empty($LOG_HANDLER) && !empty($LOG_HANDLER_TARGET)) {
+        $logger = new MonologInit_MonologInit($LOG_HANDLER, $LOG_HANDLER_TARGET);
+    } else {
+        fwrite(STDOUT, '*** loghandler or logtarget is not set.'."\n");    
+    }
+} else {
+    fwrite(STDOUT, '*** MonologInit_MonologInit logger cannot be found, continue without loghandler.'."\n");
 }
 
 // Check for jobs every $interval seconds
@@ -89,6 +88,11 @@ if(!empty($PREFIX)) {
 }
 
 $worker = new ResqueScheduler_Worker();
+if (!empty($logger)) {
+    $worker->registerLogger($logger);    
+} else {
+    fwrite(STDOUT, "*** Starting scheduler worker\n");
+}
 $worker->logLevel = $logLevel;
 
 $PIDFILE = getenv('PIDFILE');
@@ -97,5 +101,4 @@ if ($PIDFILE) {
         die('Could not write PID information to ' . $PIDFILE);
 }
 
-fwrite(STDOUT, "*** Starting scheduler worker\n");
 $worker->work($interval);
