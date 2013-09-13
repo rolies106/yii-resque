@@ -155,7 +155,7 @@ Set to `1` if you want to see more information in log file.
 ```bash
 --loghandler=[string] --logtarget=[string]
 ```
-You can see available log handler at (Monolog-Init)[https://github.com/kamisama/Monolog-Init].
+You can see available log handler at [Monolog-Init](https://github.com/kamisama/Monolog-Init).
 
 ## Copyrights
 
