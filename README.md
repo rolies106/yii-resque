@@ -32,6 +32,17 @@ Yii resque is a component for Yii to queue your background jobs, this component 
 
 - Change path for Yii framework folder in ```components/yii-resque/bin/resque```
 
+- You may want to add these additional lines to your ```console.php``` for fixing auto loading and enabling the usage of models and helpers inside your workers
+
+```php
+    ...
+    'import' => array(
+        'application.models.*',
+        'application.helpers.*',
+        'application.components.*',
+    ),
+```
+
 ## How to
 
 ### Create job and Workers
