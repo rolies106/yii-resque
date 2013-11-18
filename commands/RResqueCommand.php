@@ -72,37 +72,7 @@ EOD;
 
     public function actionStop($quit = null)
     {
-        exec("ps aux | grep resque", $out);
-
-        foreach ($out as $pid) {
-            if (strpos($pid, 'yiic rresque stop')) {
-                continue;
-            }
-
-            if (strpos($pid, 'ps aux | grep resque')) {
-                continue;
-            }
-
-            if (strpos($pid, 'grep resque')) {
-                continue;
-            }
-            
-            $pids = explode(' ', $pid);
-            $pids = array_values(array_filter($pids, 'strlen'));
-
-            $processID = (empty($pids[1])) ? $pids[2] : $pids[1];
-
-            if (empty($processID)) {
-                continue;
-            }
-
-            if (empty($quit)) {
-                $command = 'kill -9 ' . $processID;
-            } else {
-                $command = 'kill -s QUIT ' . $processID;
-            }
-
-            exec($command, $a);
-        }
+        $quit_string = $quit ? '-s QUIT': '-9';
+        exec("ps ux  | grep resque | grep -v grep | awk {'print $2'} | xargs kill $quit_string ");
     }
 }
