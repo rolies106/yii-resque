@@ -64,7 +64,7 @@ class RResque extends CApplicationComponent
 
         Resque::setBackend($this->server . ':' . $this->port, $this->database, $this->password);
         if ($this->prefix) {
-          Resque_Redis::prefix($this->prefix);    
+          Resque::redis()->prefix($this->prefix);    
         }
         
     }
