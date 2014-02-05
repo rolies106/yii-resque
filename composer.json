@@ -9,8 +9,7 @@
         {
             "name": "Rolies Deby",
             "email": "rolies106@gmail.com"
-        },
-
+        }
     ],
     "support": {
         "issues": "https://github.com/rolies106/yii-resque/issues",
