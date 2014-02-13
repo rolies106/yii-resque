@@ -41,6 +41,12 @@ class RResque extends CApplicationComponent
 
 
     public $prefix = '';
+
+    /**
+     * @var mixed include file in daemon (userul for defining YII_DEBUG, etc), may be string or array
+     */
+    public $includeFiles = '';
+
     /**
      * Initializes the connection.
      */

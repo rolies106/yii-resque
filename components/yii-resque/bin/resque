@@ -1,7 +1,16 @@
 #!/usr/bin/env php
 <?php
+$includeFiles=getenv('INCLUDE_FILES');
+if ($includeFiles) {
+    $includeFiles = explode(',', $includeFiles);
+    foreach ($includeFiles as $file) {
+        require_once $file;
+    }
+}
+
 $yiic=getenv('YII_PATH').'/yii.php';
 $config=getenv('APP_PATH').'/config/console.php';
+
 
 require_once($yiic);
 

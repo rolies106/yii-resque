@@ -45,8 +45,12 @@ EOD;
         $db = Yii::app()->resque->database ?: 0;
         $auth = Yii::app()->resque->password ?: '';
         $prefix = Yii::app()->resque->prefix;
+        $includeFiles = Yii::app()->resque->includeFiles;
+        if (is_array($includeFiles)) {
+            $includeFiles = implode(',', $includeFiles);
+        }
 
-        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE='.$queue.' COUNT='.$count.' REDIS_BACKEND='.$host.' REDIS_BACKEND_DB='.$db.' REDIS_AUTH='.$auth.' INTERVAL='.$interval.' VERBOSE='.$verbose.' YII_PATH='.$yiiPath.' APP_PATH='.$appPath.' php '.$resquePath.'/bin/'.$script.'" >> '.$appPath.'/runtime/yii_resque_log.log 2>&1 &';
+        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE='.$queue.' COUNT='.$count.' REDIS_BACKEND='.$host.' REDIS_BACKEND_DB='.$db.' REDIS_AUTH='.$auth.' INTERVAL='.$interval.' VERBOSE='.$verbose.' INCLUDE_FILES='.$includeFiles.' YII_PATH='.$yiiPath.' APP_PATH='.$appPath.' php '.$resquePath.'/bin/'.$script.'" >> '.$appPath.'/runtime/yii_resque_log.log 2>&1 &';
 
         exec($command, $return);
 
