@@ -70,6 +70,6 @@ EOD;
     public function actionStop($quit = null)
     {
         $quit_string = $quit ? '-s QUIT': '-9';
-        exec("ps ux | grep resque | grep -v grep | awk {'print $2'} | xargs kill $quit_string");
+        exec("ps uxe | grep '".escapeshellarg(Yii::app()->basePath)."' | grep 'resque' | grep -v grep | awk {'print $2'} | xargs kill $quit_string");
     }
 }
