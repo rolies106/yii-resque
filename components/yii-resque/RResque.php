@@ -41,6 +41,12 @@ class RResque extends CApplicationComponent
 
 
     public $prefix = '';
+
+    /**
+     * @var mixed include file in daemon (userul for defining YII_DEBUG, etc), may be string or array
+     */
+    public $includeFiles = '';
+
     /**
      * Initializes the connection.
      */
@@ -64,7 +70,7 @@ class RResque extends CApplicationComponent
 
         Resque::setBackend($this->server . ':' . $this->port, $this->database, $this->password);
         if ($this->prefix) {
-          Resque_Redis::prefix($this->prefix);    
+          Resque::redis()->prefix($this->prefix);    
         }
         
     }

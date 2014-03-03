@@ -23,7 +23,7 @@ if (class_exists('Redis', false))
 
 		function establishConnection()
 		{
-			$this->pconnect($this->host, (int) $this->port, (int) $this->timeout);
+			$this->connect($this->host, (int) $this->port, (int) $this->timeout);
 
 	        if (isset($this->password) && !empty($this->password)) {
 	            if ($this->auth($this->password) === false) {

@@ -1,14 +1,20 @@
 #!/usr/bin/env php
 <?php
-date_default_timezone_set('UTC');
+$includeFiles=getenv('INCLUDE_FILES');
+if ($includeFiles) {
+    $includeFiles = explode(',', $includeFiles);
+    foreach ($includeFiles as $file) {
+        require_once $file;
+    }
+}
 
-// change the following paths if necessary
-$yiic=dirname(__FILE__).'/../../../../../framework/yii.php';
-$config=dirname(__FILE__).'/../../../config/console.php';
+$yiic=getenv('YII_PATH').'/yii.php';
+$config=getenv('APP_PATH').'/config/console.php';
+
 
 require_once($yiic);
 
-Yii::createWebApplication($config);
+Yii::createConsoleApplication($config);
 
 # Turn off our amazing library autoload
 spl_autoload_unregister(array('YiiBase','autoload'));
@@ -89,7 +95,7 @@ if(!empty($COUNT) && $COUNT > 1) {
 $PREFIX = getenv('PREFIX');
 if(!empty($PREFIX)) {
     fwrite(STDOUT, '*** Prefix set to '.$PREFIX."\n");
-    Resque_Redis::prefix($PREFIX);
+    Resque::redis()->prefix($PREFIX);
 }
 
 if($count > 1) {
