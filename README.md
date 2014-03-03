@@ -20,10 +20,11 @@ Yii resque is a component for Yii to queue your background jobs, this component 
         ...
         'resque'=>array(
             'class' => 'application.components.yii-resque.RResque',
-            'server' => 'localhost',    // Redis server address
-            'port' => '6379',           // Redis server port
+            'server' => 'localhost',     // Redis server address
+            'port' => '6379',            // Redis server port
             'database' => 0,             // Redis database number
-            'password' => ''            // Redis password auth, set to '' or null when no auth needed
+            'password' => '',            // Redis password auth, set to '' or null when no auth needed
+            'includeFiles' => array()    // Absolute path of files that will be included when initiate queue
         ),
         ...
     )
@@ -43,7 +44,7 @@ Yii resque is a component for Yii to queue your background jobs, this component 
     ),
 ```
 
-Note : For performance reason you can just load require class by adding ```Yii::import()``` on your ```setUp``` function inside worker class, e.g :
+For performance reason you can just load required class by adding ```Yii::import()``` on your ```setUp``` function inside worker class, e.g :
 
 ```php
     public function setUp()
