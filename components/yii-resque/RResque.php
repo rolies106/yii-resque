@@ -84,9 +84,9 @@ class RResque extends CApplicationComponent
      *
      * @return string
      */
-    public function createJob($queue, $class, $args = array())
+    public function createJob($queue, $class, $args = array(), $track_status = false)
     {
-        return Resque::enqueue($queue, $class, $args);
+        return Resque::enqueue($queue, $class, $args, $track_status);
     }
 
     /**
