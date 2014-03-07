@@ -12,7 +12,7 @@ Yii resque is a component for Yii to queue your background jobs, this component 
 ## Configuration
 
 - Copy files to each folder
-- Add to your ```config.php``` and your ```console.php```
+- Add to your ```config/main.php``` and your ```config/console.php```
 
 ```php
     ...
