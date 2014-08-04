@@ -4,7 +4,7 @@ Yii resque is a component for Yii to queue your background jobs, this component 
 
 ## Requirement
 
-- php pnctl extension.
+- php pcntl extension.
 - [Redis.io](http://redis.io)
 - [phpredis](https://github.com/nicolasff/phpredis) extension for better performance, otherwise it'll automatically use [Credis](https://github.com/colinmollenhour/credis) as fallback.
 - Yii Framework >1.1.x
