@@ -190,11 +190,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Contributors
 
-- rolies106
-- chrisschrijver
-- summic
-- anasAsh
-- dbanck
-- herroffizier
-- davidevernizzi
-- You
+- [All Contributors](https://github.com/rolies106/yii-resque/graphs/contributors)
+- You are next
