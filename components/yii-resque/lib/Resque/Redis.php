@@ -6,6 +6,7 @@ if (class_exists('Redis', false))
 		private static $defaultNamespace = 'resque:';
 
 		public $password = null;
+                public $database = 0;
 
 		public function __construct($host, $database = 0, $password = null, $timeout = 5)
 		{
@@ -17,19 +18,21 @@ if (class_exists('Redis', false))
 			$this->port = $server[1];
 			$this->password = $password;
 			$this->timeout = $timeout;
+                        $this->database = $database;
 
 			$this->establishConnection();
 		}
 
 		function establishConnection()
 		{
-			$this->connect($this->host, (int) $this->port, (int) $this->timeout);
+    			$this->connect($this->host, (int) $this->port, (int) $this->timeout);
 
 	        if (isset($this->password) && !empty($this->password)) {
 	            if ($this->auth($this->password) === false) {
 	                throw new CException('Resque failed to authenticate with redis!');
 	            }
 	        }
+                        $this->select($this->database);
 
 			$this->setOption(Redis::OPT_PREFIX, self::$defaultNamespace);
 		}
