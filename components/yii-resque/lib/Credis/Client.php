@@ -768,6 +768,10 @@ class Credis_Client {
 
     private static function _map($arg)
     {
+         if (is_array($arg)) {
+            $arg = implode(' ', $arg);
+        }
+        
         return sprintf('$%d%s%s', strlen($arg), CRLF, $arg);
     }
 
