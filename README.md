@@ -65,6 +65,21 @@ You can put this line where ever you want to add jobs to queue
 
 Put your workers inside Worker folder and name the class with ```Worker_``` as prefix, e.g you want to create worker with name SendEmail then you can create file inside Worker folder and name it SendEmail.php, class inside this file must be ```Worker_SendEmail```
 
+### Delete Job
+
+This method could delete or remove job based on queue, worker class, and/or job id :
+
+```php
+    // This will remove job with key 'b6487da4b6d162f958bb06b405df6963' inside 'queue_name' queue and worker 'Worker_ClassWorker'
+    Yii::app()->resque->deleteJob('queue_name', 'Worker_ClassWorker', 'b6487da4b6d162f958bb06b405df6963');
+
+    // This will remove all jobs inside worker 'Worker_ClassWorker' and 'queue_name' queue
+    Yii::app()->resque->deleteJob('queue_name', 'Worker_ClassWorker');
+
+    // This will remove all jobs inside 'queue_name' queue
+    Yii::app()->resque->deleteJob('queue_name');
+```
+
 ### Create Delayed Job
 
 You can run job at specific time

@@ -90,6 +90,27 @@ class RResque extends CApplicationComponent
     }
 
     /**
+     * Delete a job based on job id or key, if worker_class is empty then it'll remove
+     * all jobs within the queue, if job_key is empty then it'll remove all jobs within
+     * provided queue and worker_class
+     *
+     * @param string $queue The name of the queue to place the job in.
+     * @param string $worker_class The name of the class that contains the code to execute the job.
+     * @param string $job_key Job key
+     * 
+     * @return bool
+     */
+    public function deleteJob($queue, $worker_class = null, $job_key = null)
+    {
+        if (!empty($job_key) && !empty($worker_class))
+            return Resque::dequeue($queue, array($worker_class => $job_key)); // Remove job with specific job key
+        else if (!empty($worker_class) && empty($job_key))
+            return Resque::dequeue($queue, array($worker_class)); // Remove all jobs inside specified worker and queue
+        else 
+            return Resque::dequeue($queue); // Remove all jobs inside queue
+    }
+
+    /**
      * Create a new scheduled job and save it to the specified queue.
      *
      * @param int $in Second count down to job.

@@ -47,6 +47,21 @@ if (class_exists('Redis', false))
 
 			$this->setOption(Redis::OPT_PREFIX, self::$defaultNamespace);
 		}
+
+		public static function getPrefix()
+		{
+		    return self::$defaultNamespace;
+		}
+
+		public static function removePrefix($string)
+		{
+		    $prefix=self::getPrefix();
+
+		    if (substr($string, 0, strlen($prefix)) == $prefix) {
+		        $string = substr($string, strlen($prefix), strlen($string) );
+		    }
+		    return $string;
+		}		
 	}
 }
 else
@@ -115,7 +130,9 @@ else
 			'zcard',
 			'zscore',
 			'zremrangebyscore',
-			'sort'
+			'sort',
+			'rpoplpush',
+			'rename'
 		);
 		// sinterstore
 		// sunion
@@ -124,8 +141,6 @@ else
 		// sdiffstore
 		// sinter
 		// smove
-		// rename
-		// rpoplpush
 		// mget
 		// msetnx
 		// mset
