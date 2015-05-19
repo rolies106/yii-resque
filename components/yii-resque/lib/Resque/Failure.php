@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Failed Resque job.
  *
@@ -35,7 +36,6 @@ class Resque_Failure
 	public static function getBackend()
 	{
 		if(self::$backend === null) {
-			require  dirname(__FILE__) . '/Failure/Redis.php';
 			self::$backend = 'Resque_Failure_Redis';
 		}
 
