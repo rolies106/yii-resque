@@ -48,10 +48,10 @@ class Resque_Job_Status
 	 *
 	 * @param string $id The ID of the job to monitor the status of.
 	 */
-	public static function create($id, $status = self::STATUS_WAITING)
+	public static function create($id)
 	{
 		$statusPacket = array(
-			'status' => $status,
+			'status' => self::STATUS_WAITING,
 			'updated' => time(),
 			'started' => time(),
 		);

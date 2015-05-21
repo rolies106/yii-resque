@@ -60,9 +60,9 @@ $LOGGING = getenv('LOGGING');
 $VERBOSE = getenv('VERBOSE');
 $VVERBOSE = getenv('VVERBOSE');
 if(!empty($LOGGING) || !empty($VERBOSE)) {
-    $logLevel = Resque_Worker::LOG_NORMAL;
+    $logLevel = true;
 } else if(!empty($VVERBOSE)) {
-    $logLevel = Resque_Worker::LOG_VERBOSE;
+    $logLevel = true;
 }
 
 $logger = null;
