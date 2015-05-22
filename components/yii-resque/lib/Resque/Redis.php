@@ -1,239 +1,169 @@
 <?php
-if (class_exists('Redis', false))
+/**
+ * Wrap Credis to add namespace support and various helper methods.
+ *
+ * @package		Resque/Redis
+ * @author		Chris Boulton <chris@bigcommerce.com>
+ * @license		http://www.opensource.org/licenses/mit-license.php
+ */
+class Resque_Redis
 {
-	class RedisApi extends Redis
-	{
-		private static $defaultNamespace = 'resque:';
+    /**
+     * Redis namespace
+     * @var string
+     */
+    private static $defaultNamespace = 'resque:';
 
-		public $password = null;
-                public $database = 0;
+    private $server;
+    private $database;
 
-		public function __construct($host, $database = 0, $password = null, $timeout = 5)
-		{
-			parent::__construct();
-
-			$server = explode(':', $host);
-
-			$this->host = $server[0];
-			$this->port = $server[1];
-			$this->password = $password;
-			$this->timeout = $timeout;
-                        $this->database = $database;
-
-			$this->establishConnection();
-		}
-
-		function establishConnection()
-		{
-    			$this->connect($this->host, (int) $this->port, (int) $this->timeout);
-
-	        if (isset($this->password) && !empty($this->password)) {
-	            if ($this->auth($this->password) === false) {
-	                throw new CException('Resque failed to authenticate with redis!');
-	            }
-	        }
-                        $this->select($this->database);
-
-			$this->setOption(Redis::OPT_PREFIX, self::$defaultNamespace);
-		}
-
-		public function prefix($namespace)
-		{
-			if (empty($namespace)) $namespace = self::$defaultNamespace;
-			if (strpos($namespace, ':') === false) {
-				$namespace .= ':';
-			}
-			self::$defaultNamespace = $namespace;
-
-			$this->setOption(Redis::OPT_PREFIX, self::$defaultNamespace);
-		}
-
-		public static function getPrefix()
-		{
-		    return self::$defaultNamespace;
-		}
-
-		public static function removePrefix($string)
-		{
-		    $prefix=self::getPrefix();
-
-		    if (substr($string, 0, strlen($prefix)) == $prefix) {
-		        $string = substr($string, strlen($prefix), strlen($string) );
-		    }
-		    return $string;
-		}		
-	}
-}
-else
-{
 	/**
-	 * Wrap Credis to add namespace support and various helper methods.
-	 *
-	 * @package		Resque/Redis
-	 * @author		Chris Boulton <chris@bigcommerce.com>
-	 * @license		http://www.opensource.org/licenses/mit-license.php
+	 * @var array List of all commands in Redis that supply a key as their
+	 *	first argument. Used to prefix keys with the Resque namespace.
 	 */
-	class RedisApi
+	private $keyCommands = array(
+		'exists',
+		'del',
+		'type',
+		'keys',
+		'expire',
+		'ttl',
+		'move',
+		'set',
+		'setex',
+		'get',
+		'getset',
+		'setnx',
+		'incr',
+		'incrby',
+		'decr',
+		'decrby',
+		'rpush',
+		'lpush',
+		'llen',
+		'lrange',
+		'ltrim',
+		'lindex',
+		'lset',
+		'lrem',
+		'lpop',
+		'rpop',
+		'sadd',
+		'srem',
+		'spop',
+		'scard',
+		'sismember',
+		'smembers',
+		'srandmember',
+		'zadd',
+		'zrem',
+		'zrange',
+		'zrevrange',
+		'zrangebyscore',
+		'zcard',
+		'zscore',
+		'zremrangebyscore',
+		'sort',
+		'rpoplpush',
+		'rename'
+	);
+	// sinterstore
+	// sunion
+	// sunionstore
+	// sdiff
+	// sdiffstore
+	// sinter
+	// smove
+	// mget
+	// msetnx
+	// mset
+	// renamenx
+
+	/**
+	 * Set Redis namespace (prefix) default: resque
+	 * @param string $namespace
+	 */
+	public static function prefix($namespace)
 	{
-	    /**
-	     * Redis namespace
-	     * @var string
-	     */
-	    private static $defaultNamespace = 'resque:';
-
-	    private $server;
-	    private $database;
-
-		/**
-		 * @var array List of all commands in Redis that supply a key as their
-		 *	first argument. Used to prefix keys with the Resque namespace.
-		 */
-		private $keyCommands = array(
-			'exists',
-			'del',
-			'type',
-			'keys',
-			'expire',
-			'ttl',
-			'move',
-			'set',
-			'setex',
-			'get',
-			'getset',
-			'setnx',
-			'incr',
-			'incrby',
-			'decr',
-			'decrby',
-			'rpush',
-			'lpush',
-			'llen',
-			'lrange',
-			'ltrim',
-			'lindex',
-			'lset',
-			'lrem',
-			'lpop',
-			'rpop',
-			'sadd',
-			'srem',
-			'spop',
-			'scard',
-			'sismember',
-			'smembers',
-			'srandmember',
-			'zadd',
-			'zrem',
-			'zrange',
-			'zrevrange',
-			'zrangebyscore',
-			'zcard',
-			'zscore',
-			'zremrangebyscore',
-			'sort',
-			'rpoplpush',
-			'rename'
-		);
-		// sinterstore
-		// sunion
-		// sunionstore
-		// sdiff
-		// sdiffstore
-		// sinter
-		// smove
-		// mget
-		// msetnx
-		// mset
-		// renamenx
-
-		/**
-		 * Set Redis namespace (prefix) default: resque
-		 * @param string $namespace
-		 */
-		public static function prefix($namespace)
-		{
-		    if (strpos($namespace, ':') === false) {
-		        $namespace .= ':';
-		    }
-		    self::$defaultNamespace = $namespace;
-		}
-
-		public function __construct($server, $database = null)
-		{
-			$this->server = $server;
-			$this->database = $database;
-
-			if (is_array($this->server)) {
-				$this->driver = new Credis_Cluster($server);
-			}
-			else {
-				$port = null;
-				$password = null;
-				$host = $server;
-
-				// If not a UNIX socket path or tcp:// formatted connections string
-				// assume host:port combination.
-				if (strpos($server, '/') === false) {
-					$parts = explode(':', $server);
-					if (isset($parts[1])) {
-						$port = $parts[1];
-					}
-					$host = $parts[0];
-				}else if (strpos($server, 'redis://') !== false){
-					// Redis format is:
-					// redis://[user]:[password]@[host]:[port]
-					list($userpwd,$hostport) = explode('@', $server);
-					$userpwd = substr($userpwd, strpos($userpwd, 'redis://')+8);
-					list($host, $port) = explode(':', $hostport);
-					list($user, $password) = explode(':', $userpwd);
-				}
-				
-				$this->driver = new Credis_Client($host, $port);
-				if (isset($password)){
-					$this->driver->auth($password);
-				}
-			}
-
-			if ($this->database !== null) {
-				$this->driver->select($database);
-			}
-		}
-
-		/**
-		 * Magic method to handle all function requests and prefix key based
-		 * operations with the {self::$defaultNamespace} key prefix.
-		 *
-		 * @param string $name The name of the method called.
-		 * @param array $args Array of supplied arguments to the method.
-		 * @return mixed Return value from Resident::call() based on the command.
-		 */
-		public function __call($name, $args) {
-			if(in_array($name, $this->keyCommands)) {
-			    $args[0] = self::$defaultNamespace . $args[0];
-			}
-			try {
-				return $this->driver->__call($name, $args);
-			}
-			catch(CredisException $e) {
-				return false;
-			}
-		}
-
-	    public static function getPrefix()
-	    {
-	        return self::$defaultNamespace;
+	    if (strpos($namespace, ':') === false) {
+	        $namespace .= ':';
 	    }
-
-	    public static function removePrefix($string)
-	    {
-	        $prefix=self::getPrefix();
-
-	        if (substr($string, 0, strlen($prefix)) == $prefix) {
-	            $string = substr($string, strlen($prefix), strlen($string) );
-	        }
-	        return $string;
-	    }
+	    self::$defaultNamespace = $namespace;
 	}
-}
 
-class Resque_Redis extends RedisApi {}
+	public function __construct($server, $database = null)
+	{
+		$this->server = $server;
+		$this->database = $database;
+
+		if (is_array($this->server)) {
+			$this->driver = new Credis_Cluster($server);
+		}
+		else {
+			$port = null;
+			$password = null;
+			$host = $server;
+
+			// If not a UNIX socket path or tcp:// formatted connections string
+			// assume host:port combination.
+			if (strpos($server, '/') === false) {
+				$parts = explode(':', $server);
+				if (isset($parts[1])) {
+					$port = $parts[1];
+				}
+				$host = $parts[0];
+			}else if (strpos($server, 'redis://') !== false){
+				// Redis format is:
+				// redis://[user]:[password]@[host]:[port]
+				list($userpwd,$hostport) = explode('@', $server);
+				$userpwd = substr($userpwd, strpos($userpwd, 'redis://')+8);
+				list($host, $port) = explode(':', $hostport);
+				list($user, $password) = explode(':', $userpwd);
+			}
+			
+			$this->driver = new Credis_Client($host, $port);
+			if (isset($password)){
+				$this->driver->auth($password);
+			}
+		}
+
+		if ($this->database !== null) {
+			$this->driver->select($database);
+		}
+	}
+
+	/**
+	 * Magic method to handle all function requests and prefix key based
+	 * operations with the {self::$defaultNamespace} key prefix.
+	 *
+	 * @param string $name The name of the method called.
+	 * @param array $args Array of supplied arguments to the method.
+	 * @return mixed Return value from Resident::call() based on the command.
+	 */
+	public function __call($name, $args) {
+		if(in_array($name, $this->keyCommands)) {
+		    $args[0] = self::$defaultNamespace . $args[0];
+		}
+		try {
+			return $this->driver->__call($name, $args);
+		}
+		catch(CredisException $e) {
+			return false;
+		}
+	}
+
+    public static function getPrefix()
+    {
+        return self::$defaultNamespace;
+    }
+
+    public static function removePrefix($string)
+    {
+        $prefix=self::getPrefix();
+
+        if (substr($string, 0, strlen($prefix)) == $prefix) {
+            $string = substr($string, strlen($prefix), strlen($string) );
+        }
+        return $string;
+    }
+}
