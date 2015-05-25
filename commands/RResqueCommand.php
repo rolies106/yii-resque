@@ -45,12 +45,17 @@ EOD;
         $db = Yii::app()->resque->database ?: 0;
         $auth = Yii::app()->resque->password ?: '';
         $prefix = Yii::app()->resque->prefix;
+        $loghandler = Yii::app()->resque->loghandler;
+        $logtarget = Yii::app()->resque->logtarget;
         $includeFiles = Yii::app()->resque->includeFiles;
+
         if (is_array($includeFiles)) {
             $includeFiles = implode(',', $includeFiles);
         }
 
-        $command = 'nohup sh -c "PREFIX='.$prefix.' QUEUE='.$queue.' COUNT='.$count.' REDIS_BACKEND='.$host.' REDIS_BACKEND_DB='.$db.' REDIS_AUTH='.$auth.' INTERVAL='.$interval.' VERBOSE='.$verbose.' INCLUDE_FILES='.$includeFiles.' YII_PATH='.$yiiPath.' APP_PATH='.$appPath.' php '.$resquePath.'/bin/'.$script.'" >> '.$appPath.'/runtime/yii_resque_log.log 2>&1 &';
+        $options = '';
+
+        $command = 'nohup sh -c "LOGHANDLER='.$loghandler.' LOGHANDLERTARGET='.$logtarget.' PREFIX='.$prefix.' QUEUE='.$queue.' COUNT='.$count.' REDIS_BACKEND='.$host.' REDIS_BACKEND_DB='.$db.' REDIS_AUTH='.$auth.' INTERVAL='.$interval.' VERBOSE='.$verbose.' INCLUDE_FILES='.$includeFiles.' YII_PATH='.$yiiPath.' APP_PATH='.$appPath.' ' . $options . ' php '.$resquePath.'/bin/'.$script.'" >> '.$appPath.'/runtime/yii_resque_log.log 2>&1 &';
 
         exec($command, $return);
 

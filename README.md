@@ -25,6 +25,8 @@ Yii resque is a component for Yii to queue your background jobs, this component 
         'database' => 0,             // Redis database number
         'password' => '',            // Redis password auth, set to '' or null when no auth needed
         'includeFiles' => array()    // Absolute path of files that will be included when initiate queue
+        'loghandler' => 'RotatingFile' // Monolog handler type without "handler"
+        'logtarget' => '/var/log/mylog' // Target log file
     ),
     ...
 )
@@ -186,12 +188,9 @@ Set to `1` if you want to see more information in log file.
 --count=[integer]
 ```
 
-* Log handler name and log handler target
+## Logging
 
-```bash
---loghandler=[string] --logtarget=[string]
-```
-You can see available log handler at [Monolog-Init](https://github.com/kamisama/Monolog-Init).
+I'm using [Monolog](https://github.com/Seldaek/monolog) for logging with help from [Monolog-Init](https://github.com/kamisama/Monolog-Init), so you can refer to both of repository to see available handler and how to use it.
 
 ## Copyrights
 

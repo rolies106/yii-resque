@@ -39,8 +39,22 @@ class RResque extends CApplicationComponent
      */
     public $password = '';
 
-
+    /**
+     * @var string
+     */
     public $prefix = '';
+
+    /**
+     * Log handler for Monolog
+     * @var string
+     */
+    public $loghandler = null;
+
+    /**
+     * Log handler target for Monolog
+     * @var string
+     */
+    public $logtarget = null;
 
     /**
      * @var mixed include file in daemon (userul for defining YII_DEBUG, etc), may be string or array
