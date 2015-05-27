@@ -60,7 +60,7 @@ public function setUp()
 You can put this line where ever you want to add jobs to queue
 
 ```php
-Yii::app()->resque->createJob('queue_name', 'Worker_ClassWorker', $args = array());
+Yii::app()->resque->createJob('queue_name', 'Worker_ClassWorker', $args = array(), $track = true);
 ```
 
 Put your workers inside Worker folder and name the class with ```Worker_``` as prefix, e.g you want to create worker with name SendEmail then you can create file inside Worker folder and name it SendEmail.php, class inside this file must be ```Worker_SendEmail```
@@ -88,7 +88,7 @@ You can run job at specific time
 
 ```php
 $time = 1332067214;
-Yii::app()->resque->enqueueJobAt($time, 'queue_name', 'Worker_ClassWorker', $args = array());
+Yii::app()->resque->enqueueJobAt($time, 'queue_name', 'Worker_ClassWorker', $args = array(), $track = true);
 ```
 
 or run job after n second 
@@ -96,7 +96,19 @@ or run job after n second
 ```php
 $in = 3600;
 $args = array('id' => $user->id);
-Yii::app()->resque->enqueueIn($in, 'email', 'Worker_ClassWorker', $args);
+Yii::app()->resque->enqueueIn($in, 'email', 'Worker_ClassWorker', $args, $track = true);
+```
+
+### Check Job Status
+
+You can get job status by this code :
+
+```php
+// This will return int : 1, 2, 3, 4, or 63
+$int = Yii::app()->resque->status($queue_token);
+
+// This will return string : waiting, running, failed, completed, or scheduled
+$string = Yii::app()->resque->statusToString($int);
 ```
 
 ### Create Recurring Job
@@ -114,6 +126,14 @@ public function tearDown()
 ```
 
 So everytime job has done completely the worker will send queue for same job.
+
+### Get Total Scheduled Jobs
+
+This will return total of scheduled jobs in queue (EXCLUDE all active job)
+
+```php
+Yii::app()->resque->getDelayedJobsCount();
+```
 
 ### Get Current Queues
 

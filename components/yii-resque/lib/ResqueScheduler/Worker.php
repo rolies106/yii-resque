@@ -109,7 +109,30 @@ class ResqueScheduler_Worker
 			setproctitle('resque-scheduler-' . ResqueScheduler::VERSION . ': ' . $status);
 		}
 	}
-	
+
+    /**
+     * Register class instance as a logger
+     * @param  object 	$logger 	Class instance
+     * @return void
+     */
+    public function registerLogger($logger = null)
+    {
+        $this->logger = $logger->getInstance();
+        Resque::redis()->hset('workerLogger', (string) get_class($this), json_encode(array($logger->handler, $logger->target)));
+    }
+
+    /**
+     * Get current logger instance
+     * @param  string 	$workerId 	Worker id
+     * @return object
+     */
+    public function getLogger($workerId)
+    {
+        $settings = json_decode(Resque::redis()->hget('workerLogger', (string)$workerId));
+        $logger = new MonologInit_MonologInit($settings[0], $settings[1]);
+        return $logger->getInstance();
+    }
+
 	/**
 	 * Output a given log message to STDOUT.
 	 *
