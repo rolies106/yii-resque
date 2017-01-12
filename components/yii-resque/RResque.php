@@ -234,4 +234,23 @@ class RResque extends CApplicationComponent
     {
         return $this->redis()->zRange('resque:' . ResqueScheduler::QUEUE_NAME, 0, -1);
     }
+    
+   /**
+     * Run function on Resque class
+     * you can use second, third and so on args to pass to the Resque function
+     * e.g : calling $this->getResque("function", "arg1", "arg2") will be calling as Resque::function("arg1", "arg2")
+     *
+     * @return mixed
+     */
+    public function getResque($func)
+    {
+        if (method_exists("Resque", $func) 
+        {
+            $numargs = func_num_args();
+            unset($numargs[0]);
+            return call_user_func_array(array("Resque", $func), $numargs);
+        }
+            
+        return false;
+    }
 }
