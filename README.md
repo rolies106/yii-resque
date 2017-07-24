@@ -20,12 +20,12 @@ Yii resque is a component for Yii to queue your background jobs, this component 
     ...
     'resque'=>array(
         'class' => 'application.components.yii-resque.RResque',
-        'server' => 'localhost',     // Redis server address
-        'port' => '6379',            // Redis server port
-        'database' => 0,             // Redis database number
-        'password' => '',            // Redis password auth, set to '' or null when no auth needed
-        'includeFiles' => array()    // Absolute path of files that will be included when initiate queue
-        'loghandler' => 'RotatingFile' // Monolog handler type without "handler"
+        'server' => 'localhost',        // Redis server address
+        'port' => '6379',               // Redis server port
+        'database' => 0,                // Redis database number
+        'password' => '',               // Redis password auth, set to '' or null when no auth needed
+        'includeFiles' => array(),      // Absolute path of files that will be included when initiate queue
+        'loghandler' => 'RotatingFile', // Monolog handler type without "handler"
         'logtarget' => '/var/log/mylog' // Target log file or configuration (please refer to logging section)
     ),
     ...
