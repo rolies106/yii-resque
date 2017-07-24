@@ -244,7 +244,7 @@ class RResque extends CApplicationComponent
      */
     public function getResque($func)
     {
-        if (method_exists("Resque", $func) 
+        if (method_exists("Resque", $func))
         {
             $numargs = func_num_args();
             unset($numargs[0]);
