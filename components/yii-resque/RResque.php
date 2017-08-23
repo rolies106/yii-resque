@@ -202,7 +202,7 @@ class RResque extends CApplicationComponent
                 break;
 
             case Resque_Job_Status::STATUS_COMPLETE:
-                return "Failed";
+                return "Completed";
                 break;
 
             case ResqueScheduler_Job_Status::STATUS_SCHEDULED:
